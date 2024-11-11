@@ -1,0 +1,2 @@
+cd frontend
+pnpm dlx commitlint --verbose --edit $1

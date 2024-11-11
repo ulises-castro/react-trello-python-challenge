@@ -1,4 +1,5 @@
 cd frontend
+pnpm lint-staged
 
 # Run lint-staged, eslint rules, formater.. only if there changes into frontend folder
 if [ -n "$(git diff --cached --name-only | grep -E '^frontend/')" ]; then
