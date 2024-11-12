@@ -1,14 +1,10 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Board from "./components/Board"
 
 function App() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">
-        Trello
-      </h1>
+      <div className="bg-[#255c8f] p-4 text-center w-full text-xl md:text-5xl text-white mb-4"> Board </div>
+      <Board />
     </>
   )
 }
