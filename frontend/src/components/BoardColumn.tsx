@@ -3,14 +3,14 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Task } from '../types';
+import { ITask } from '../types';
 import TaskItem from './TaskItem';
 import SortableTaskItem from './SortableTaskItem';
 
 type BoardColumnProps = {
   id: string;
   title: string;
-  tasks: Task[];
+  tasks: ITask[];
 };
 
 export default function BoardColumn({ id, title, tasks }: BoardColumnProps) {

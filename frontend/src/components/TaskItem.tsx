@@ -1,7 +1,7 @@
-import { Task } from '../types';
+import { ITask } from '../types';
 
 type TaskItemProps = {
-  task: Task;
+  task: ITask;
 };
 
 const Card = ({ children }) => {

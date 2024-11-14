@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useSensors,
   useSensor,
@@ -16,19 +16,60 @@ import {
 import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 
 import { DUMMY_TASKS } from '../data';
-import { BoardColumns } from '../types';
+import { BoardColumnsType } from '../types';
 import { getTaskById } from '../utils/tasks';
 import { findBoardColumnContainer, initializeBoard } from '../utils/board';
 import BoardColumn from './BoardColumn';
 import TaskItem from './TaskItem';
 
+import { gql, useQuery } from "@apollo/client";
+import { ITask } from "./types";
+
+
+const GET_TASKS_BY_STATUS = gql`
+  query TasksByStatus($status: String!) {
+		tasksByStatus(status: $status) {
+    taskID
+    title
+		description
+  	}
+  }
+`;
+
+const GET_ALL_TASKS = gql`
+  query ALL_TASKS {
+		tasks {
+      taskID
+      title
+      description
+      status
+  	}
+  }
+`;
+
+
 export default function Board() {
+  const { loading, error, data } = useQuery<ITask[]>(GET_ALL_TASKS);
+
   const tasks = DUMMY_TASKS;
   const initialBoardColumns = initializeBoard(DUMMY_TASKS);
   const [boardColumns, setBoardColumns] =
-    useState<BoardColumns>(initialBoardColumns);
+    useState<BoardColumnsType | null>(null);
 
   const [activeTaskId, setActiveTaskId] = useState<null | string>(null);
+
+
+  useEffect(() => {
+    if (loading || !data) return
+
+    if (data?.tasks) {
+      // const newBoardCols = {}
+
+      // const initialBoardColumns = initializeBoard(data.tasks)
+      setBoardColumns(initialBoardColumns)
+    }
+
+  }, [loading, data])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -37,8 +78,9 @@ export default function Board() {
     })
   );
 
-  const validateDragDropArea = (event: DragOverEvent | DragEndEvent) => {
+  const validateDragDropArea = (event: DragOverEvent | DragEndEvent, dragEnd = false) => {
     const { active, over } = event
+
     // Find the containers
     const activeContainer = findBoardColumnContainer(
       boardColumns,
@@ -51,7 +93,7 @@ export default function Board() {
 
     const isSameDroppableBoard = activeContainer === overContainer
     const invalidDroppableArea = !activeContainer || !overContainer
-    if (invalidDroppableArea || isSameDroppableBoard) return null
+    if (invalidDroppableArea || isSameDroppableBoard && !dragEnd || !isSameDroppableBoard && dragEnd) return null
 
     return {
       activeContainer, overContainer
@@ -99,7 +141,7 @@ export default function Board() {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const validation = validateDragDropArea(event)
+    const validation = validateDragDropArea(event, true)
 
     if (!validation) return
     const { active, over } = event
@@ -130,6 +172,10 @@ export default function Board() {
     ...defaultDropAnimation,
   };
 
+  if (loading || !boardColumns) return <p>Loading...</p>;
+  if (error) return <p>Error : {error.message}</p>;
+
+  // const task = activeTaskId ? getTaskById(data.tasks, activeTaskId) : null;
   const task = activeTaskId ? getTaskById(tasks, activeTaskId) : null;
 
   return (
