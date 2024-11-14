@@ -39,6 +39,7 @@ const GET_TASKS_BY_STATUS = gql`
 const GET_ALL_TASKS = gql`
   query ALL_TASKS {
 		tasks {
+      id
       taskID
       title
       description
@@ -52,11 +53,10 @@ export default function Board() {
   const { loading, error, data } = useQuery<ITask[]>(GET_ALL_TASKS);
 
   const tasks = DUMMY_TASKS;
-  const initialBoardColumns = initializeBoard(DUMMY_TASKS);
   const [boardColumns, setBoardColumns] =
     useState<BoardColumnsType | null>(null);
 
-  const [activeTaskId, setActiveTaskId] = useState<null | string>(null);
+  const [activeId, setActiveId] = useState<null | string>(null);
 
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function Board() {
     if (data?.tasks) {
       // const newBoardCols = {}
 
-      // const initialBoardColumns = initializeBoard(data.tasks)
+      const initialBoardColumns = initializeBoard(data.tasks)
       setBoardColumns(initialBoardColumns)
     }
 
@@ -101,7 +101,7 @@ export default function Board() {
   }
 
   const handleDragStart = ({ active }: DragStartEvent) => {
-    setActiveTaskId(active.id as string);
+    setActiveId(active.id as string);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -165,7 +165,7 @@ export default function Board() {
       }));
     }
 
-    setActiveTaskId(null);
+    setActiveId(null);
   };
 
   const dropAnimation: DropAnimation = {
@@ -175,8 +175,8 @@ export default function Board() {
   if (loading || !boardColumns) return <p>Loading...</p>;
   if (error) return <p>Error : {error.message}</p>;
 
-  // const task = activeTaskId ? getTaskById(data.tasks, activeTaskId) : null;
-  const task = activeTaskId ? getTaskById(tasks, activeTaskId) : null;
+  const task = activeId ? getTaskById(data.tasks, activeId) : null;
+  // const task = activeTaskId ? getTaskById(tasks, activeTaskId) : null;
 
   return (
     <div className='min-w-[768px] overflow-x-auto mx-auto px-4'>

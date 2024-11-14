@@ -1,4 +1,6 @@
-import { BoardColumnsType, TaskStatus, ITask } from '../types';
+import {
+  BoardColumnsType, TaskStatus, ITask
+} from '../types';
 import { getTasksByStatus } from './tasks';
 
 export const initializeBoard = (tasks: ITask[]) => {
