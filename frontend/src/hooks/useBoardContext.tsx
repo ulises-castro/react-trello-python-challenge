@@ -3,7 +3,7 @@ import { BoardContext } from "@/state/BoardProvider"
 import { ITask } from "@/types"
 
 
-export const useTaskModal = () => {
+export const useBoardContext = () => {
 	const context = useContext(BoardContext)
 
 	if (!context) {
@@ -29,7 +29,7 @@ export const useTaskModal = () => {
 	}
 
 	const handleDeleteTask = () => {
-		console.log('hi there')
+		console.log('Delete modal')
 		dispatch({
 			type: 'CLOSE_MODAL',
 		})
