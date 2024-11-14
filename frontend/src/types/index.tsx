@@ -7,7 +7,7 @@ export enum TaskStatus {
 	DONE = "DONE",
 }
 
-export type Task = {
+export interface ITask {
 	id: string;
 	title: string;
 	description: string;
@@ -15,6 +15,6 @@ export type Task = {
 };
 
 // TODO: Convert into map to improve perforrmance
-export type BoardColumns = Record<TaskStatus, Task[]>
+export type BoardColumnsType = Record<TaskStatus, ITask[]>
 
 

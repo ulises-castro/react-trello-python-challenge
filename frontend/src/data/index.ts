@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from '../types';
+import { ITask, TaskStatus } from '../types';
 
 const unique = (() => {
   let id = 0;
@@ -8,7 +8,7 @@ const unique = (() => {
   }
 })()
 
-export const DUMMY_TASKS: Task[] = [
+export const DUMMY_TASKS: ITask[] = [
   {
     id: unique(),
     title: 'Title 1',

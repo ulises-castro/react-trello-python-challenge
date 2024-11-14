@@ -1,8 +1,8 @@
-import { BoardColumns, TaskStatus, Task } from '../types';
+import { BoardColumnsType, TaskStatus, ITask } from '../types';
 import { getTasksByStatus } from './tasks';
 
-export const initializeBoard = (tasks: Task[]) => {
-  const boardCols: BoardColumns = {} as BoardColumns;
+export const initializeBoard = (tasks: ITask[]) => {
+  const boardCols: BoardColumnsType = {} as BoardColumnsType;
 
   Object.values(TaskStatus).forEach((boardColKey) => {
     boardCols[boardColKey as TaskStatus] = getTasksByStatus(
@@ -15,7 +15,7 @@ export const initializeBoard = (tasks: Task[]) => {
 };
 
 export const findBoardColumnContainer = (
-  boardColumns: BoardColumns,
+  boardColumns: BoardColumnsType,
   id: string
 ) => {
   if (id in boardColumns) {
