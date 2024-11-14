@@ -19,45 +19,30 @@ import { DUMMY_TASKS } from '../data';
 import { BoardColumnsType } from '../types';
 import { getTaskById } from '../utils/tasks';
 import { findBoardColumnContainer, initializeBoard } from '../utils/board';
-import BoardColumn from './BoardColumn';
+import TaskList from './TaskList';
 import TaskItem from './TaskItem';
 
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { ITask } from "./types";
-
-
-const GET_TASKS_BY_STATUS = gql`
-  query TasksByStatus($status: String!) {
-		tasksByStatus(status: $status) {
-    taskID
-    title
-		description
-  	}
-  }
-`;
-
-const GET_ALL_TASKS = gql`
-  query ALL_TASKS {
-		tasks {
-      id
-      taskID
-      title
-      description
-      status
-  	}
-  }
-`;
+import { BoardProvider } from '../state/BoardProvider';
+import TaskModal from './task/TaskModal';
+import { GET_ALL_TASKS } from '@/graphql/queries';
 
 
 export default function Board() {
-  const { loading, error, data } = useQuery<ITask[]>(GET_ALL_TASKS);
+  const { loading, error, data, refetch } = useQuery<ITask[]>(GET_ALL_TASKS);
 
   const tasks = DUMMY_TASKS;
   const [boardColumns, setBoardColumns] =
     useState<BoardColumnsType | null>(null);
 
   const [activeId, setActiveId] = useState<null | string>(null);
+  
 
+  // // TODO on updates 
+  // useEffect(()=> {
+    
+  // }, [])
 
   useEffect(() => {
     if (loading || !data) return
@@ -72,7 +57,11 @@ export default function Board() {
   }, [loading, data])
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -187,20 +176,23 @@ export default function Board() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-row w-full gap-4">
-          {Object.keys(boardColumns).map((boardColKey) => (
-            <div className='w-80' key={boardColKey}>
-              <BoardColumn
-                id={boardColKey}
-                title={boardColKey}
-                tasks={boardColumns[boardColKey]}
-              />
-            </div>
-          ))}
-          <DragOverlay dropAnimation={dropAnimation}>
-            {task ? <TaskItem task={task} /> : null}
-          </DragOverlay>
-        </div>
+        <BoardProvider>
+          <TaskModal />
+          <div className="flex flex-row w-full gap-4">
+            {Object.keys(boardColumns).map((boardColKey) => (
+              <div className='w-80' key={boardColKey}>
+                <TaskList
+                  id={boardColKey}
+                  title={boardColKey}
+                  tasks={boardColumns[boardColKey]}
+                />
+              </div>
+            ))}
+            <DragOverlay dropAnimation={dropAnimation}>
+              {task ? <TaskItem task={task} /> : null}
+            </DragOverlay>
+          </div>
+        </BoardProvider>
       </DndContext>
     </div>
   );
