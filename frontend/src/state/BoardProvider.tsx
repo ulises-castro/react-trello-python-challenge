@@ -1,60 +1,46 @@
-import { createContext, useContext, useReducer } from "react"
-import Board from "../components/Board"
+import { useReducer } from "react"
+import { BoardContext } from "./BoardContext"
 
 const initialState = {
   targetTask: '',
-  action: ''
+  action: '',
+  taskListTarget: ''
 }
 
 const reducer = (state, action) => {
+  const updatedState = {
+    ...state,
+    action: action.type
+  }
+
   switch (action.type) {
     case 'CLOSE_MODAL':
-      return {
-        ...state,
-        targetTask: null,
-        action: ''
-      }
+      return initialState 
     case 'ADD_TASK':
       return {
-        ...state,
-        action: 'ADD_TASK'
+        ...updatedState,
+        taskListTarget: action.taskListTarget 
       }
     case 'EDIT_TASK':
       return {
-        ...state,
+        ...updatedState,
         targetTask: action.payload.targetTask,
-        action: 'EDIT_TASK'
       }
     case 'DELETE_TASK':
       return {
-        ...state,
+        ...updatedState,
         targetTask: action.payload.targetTask,
-        action: 'DELETE_TASK'
-      }
-    // case 'EDIT_TASK':
-    //   return {
-    //     ...state,
-    //     targetTask: action.payload.targetTask,
-    //     action: action.payload.action
-    //   }
-    case 'TOGGLE_MODAL':
-      return {
-        ...state,
-        action: '',
-        targetTask: state.targetTask ? null : state.action.payload
       }
     default:
       return state
   }
 }
 
-export const BoardContext = createContext()
-
-export const BoardProvider = ({ children }) => {
+export const BoardProvider = ({ children, refetchTasks }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
-    <BoardContext.Provider value={{ state, dispatch }}>
+    <BoardContext.Provider value={{ state, dispatch, refetchTasks }}>
       {children}
     </BoardContext.Provider>
   )

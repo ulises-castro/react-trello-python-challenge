@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { BoardContext } from "@/state/BoardProvider"
+import { BoardContext } from "@/state/BoardContext"
 import { ITask } from "@/types"
 
 
@@ -10,11 +10,11 @@ export const useBoardContext = () => {
 		throw new Error('useTaskModal must be used within a CounterProvider')
 	}
 
-	const { state, dispatch } = context
+	const { state, dispatch, refetchTasks } = context
 	const isTaskModalOpen = !!state.action
+	const taskListTarget = state.taskListTarget
 
-	const handleOpenModal = (task: ITask) => {
-		console.log('hi there', task)
+	const openEditModal = (task: ITask) => {
 		dispatch({
 			type: 'EDIT_TASK',
 			payload: {
@@ -22,13 +22,13 @@ export const useBoardContext = () => {
 			}
 		})
 	}
-	const handleCloseModal = () => {
+	const closeModal = () => {
 		dispatch({
 			type: 'CLOSE_MODAL'
 		})
 	}
 
-	const handleDeleteTask = () => {
+	const deleteTask = () => {
 		console.log('Delete modal')
 		dispatch({
 			type: 'CLOSE_MODAL',
@@ -38,10 +38,12 @@ export const useBoardContext = () => {
 	return {
 		state,
 		dispatch,
+		refetchTasks,
 		task: state.targetTask,
+		status: taskListTarget,
 		isTaskModalOpen,
-		handleCloseModal,
-		handleDeleteTask,
-		handleOpenModal
+		closeModal,
+		deleteTask,
+		openEditModal
 	}
 }
