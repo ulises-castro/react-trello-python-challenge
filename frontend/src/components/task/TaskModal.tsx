@@ -4,24 +4,17 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useTaskModal } from "@/hooks/useTaskModal"
+import { useBoardContext } from "@/hooks/useBoardContext"
 import { Textarea } from "../ui/textarea"
 import { useEffect, useState } from "react"
 
-const initialNewTask = {
-	title: '',
-	description: ''
-}
-
 export default function TaskModal() {
-	const { handleCloseModal, isTaskModalOpen, state, task } = useTaskModal()
+	const { handleCloseModal, isTaskModalOpen, state, task } = useBoardContext()
 	const isEditMode = state.action === 'EDIT_TASK'
 
 	const [title, setTitle] = useState('')
@@ -33,14 +26,16 @@ export default function TaskModal() {
 	}, [task])
 
 	const onSubmit = (event) => {
-
+		// TODO add task 
 	}
 
 	if (!isTaskModalOpen) return null
 
+	const isValid = description && title
+
 	return (
 		<Dialog open={isTaskModalOpen}>
-			<DialogContent className="sm:max-w-md" onCloseModal={handleCloseModal}>
+			<DialogContent className="sm:max-w-md" onCloseModal={handleCloseModal} onEscapeKeyDown={handleCloseModal} onInteractOutside={handleCloseModal}>
 				<DialogHeader>
 					<DialogTitle> {isEditMode ? `Edit task "${task.title}"` : 'Add a new task'}</DialogTitle>
 				</DialogHeader>
@@ -64,7 +59,7 @@ export default function TaskModal() {
 							Close
 						</Button>
 					</DialogClose>
-					{isEditMode ? <Button type="submit">Save</Button> : <Button type="submit">Create</Button>}
+					{isEditMode ? <Button type="submit" disabled={!isValid}>Save</Button> : <Button type="submit" disabled={!isValid}>Create</Button>}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
