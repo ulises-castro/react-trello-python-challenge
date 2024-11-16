@@ -2,7 +2,7 @@ import logging
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from backend.task_data import DUMMY_TASKS
+from src.task_data import DUMMY_TASKS
 
 logger = logging.getLogger(__name__)
 

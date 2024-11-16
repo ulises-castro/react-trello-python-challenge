@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, Schema, Enum, InputObjectType, List, Boolean
-from .helpers.task_table import task_table
+from src.helpers.task_table import task_table
 import graphene
 
 
