@@ -1,32 +1,19 @@
+import { X } from "lucide-react";
+
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  CardContent, CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { useBoardContext } from "@/hooks/useBoardContext";
+import { useDeleteTask } from "@/hooks/useTaskActions";
 
 import { ITask } from '../types';
-import { useBoardContext } from "@/hooks/useBoardContext";
-import { X } from "lucide-react";
 import { Button } from "./ui/button";
-import { useAddTask, useDeleteTask } from "@/hooks/useTaskActions";
 
 type TaskItemProps = {
   task: ITask;
 };
-
-// const Card = ({ children }) => {
-//   return <div className='bg-white shadow-md rounded-md p-2'>{children}</div>
-// }
-
-// const CardDescription = ({ children }) => {
-//   return <div>{children}</div>
-// }
-// const CardTitle = ({ children }) => {
-//   return <h4>{children}</h4>
-// }
 
 const TaskItem = ({ task }: TaskItemProps) => {
   const { closeModal, refetchTasks, openEditModal } = useBoardContext()
@@ -43,7 +30,6 @@ const TaskItem = ({ task }: TaskItemProps) => {
     } catch (e) {
       console.error(e);
     }
-
   }
 
   return (
