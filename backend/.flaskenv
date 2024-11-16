@@ -1,3 +1,7 @@
 FLASK_APP=app.py
 FLASK_ENV=development
 FLASK_DEBUG=True
+AWS_DEFAULT_REGION=us-west-2
+AWS_ENDPOINT_URL=http://localhost:8000
+AWS_ACCESS_KEY_ID=fakeAccessKeyId
+AWS_SECRET_ACCESS_KEY=fakeSecretAccessKey

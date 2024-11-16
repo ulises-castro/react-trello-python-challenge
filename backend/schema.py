@@ -17,39 +17,29 @@ class Task(ObjectType):
     description = String()
     createdAt = String()
     status = TaskStatusOptions()
-    # TODO
-    # sorted_order = to save the latest position it was sorted
 
 
-class NewTaskInput(InputObjectType):
-    title = String(required=True)
-    description = String(required=True)
+class UpdateTaskNewValuesInput(InputObjectType):
+    title = String()
+    description = String()
+    status = TaskStatusOptions()
 
 
 # Define the Query class, which will allow fetching task information
-class Query(ObjectType):
-    all_tasks = List(Task)
-
-    def resolve_all_tasks(self, info):
-
-        tasks = task_table.get_all_tasks()
-        return list(map(lambda task: {**task, "id": task["taskID"]}, tasks))
-
-
-class UpdateTaskStatus(graphene.Mutation):
+class UpdateTask(graphene.Mutation):
     class Arguments:
         taskID = String(required=True)
-        status = TaskStatusOptions(required=True)
-        # input = CreateTaskInput(required=True)
-
-    # pass
+        new_values = UpdateTaskNewValuesInput(required=True)
 
     task = graphene.Field(Task)
 
-    def mutate(self, info, id, status):
-        # Normally, fetch and update the task status in a database
-        task = Task(id=id, title="Sample Task", status=status)
-        return UpdateTaskStatus(task=task)
+    def mutate(self, info, taskID, new_values):
+        status = new_values.get("status")
+        if status:
+            new_values["status"] = status.value
+        task = task_table.update_task(taskID, new_values)
+
+        return UpdateTask(task=task)
 
 
 # Define the CreateTask mutation class
@@ -86,10 +76,18 @@ class DeleteTask(graphene.Mutation):
             return DeleteTask(ok=False, message="Failed to delete task.")
 
 
+class Query(ObjectType):
+    all_tasks = List(Task)
+
+    def resolve_all_tasks(self, info):
+        tasks = task_table.get_all_tasks()
+        return list(map(lambda task: {**task, "id": task["taskID"]}, tasks))
+
+
 # Define the root Mutation class, which includes all mutation classes
 class Mutation(graphene.ObjectType):
     add_task = AddTask.Field()  # Expose CreateTask mutation as 'create_task'
-    update_task_status = UpdateTaskStatus.Field()
+    update_task = UpdateTask.Field()
     delete_task = DeleteTask.Field()
 
 
