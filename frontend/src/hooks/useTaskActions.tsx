@@ -1,4 +1,4 @@
-import { ADD_TASK, DELETE_TASK } from "@/graphql/mutations";
+import { ADD_TASK, DELETE_TASK, UPDATE_TASK } from "@/graphql/mutations";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect } from "react";
 import { toast, useToast } from "./use-toast";
@@ -91,14 +91,14 @@ export function useAddTask() {
 
 export function useUpdateTask() {
 	// Destructure the mutation function and its states from useMutation
-	const [addTask, { data, loading, error }] = useMutation(ADD_TASK, {
+	const [updateTask, { data, loading, error }] = useMutation(UPDATE_TASK, {
 		update(cache, { data: { deleteItem } }) {
-			if (deleteItem.ok) {
+			// if (deleteItem.ok) {
 				// Optionally update your cache here to reflect the deletion
-			}
+			// }
 		},
 	});
 	useTaskActionToast({ data, loading, error, action: "updated" })
 
-	return { addTask, data, loading }
+	return { updateTask, data, loading }
 }

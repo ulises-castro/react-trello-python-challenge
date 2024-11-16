@@ -6,9 +6,7 @@ import {
 import { ITask } from '../types';
 import TaskItem from './TaskItem';
 import SortableTaskItem from './SortableTaskItem';
-import TaskModal from './task/TaskModal';
-import { useState } from 'react';
-import { useTaskModal } from '@/hooks/useTaskModal';
+import { useBoardContext } from '@/hooks/useBoardContext';
 import { Plus } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -43,17 +41,18 @@ export default function TaskList({ id, title, tasks }: TaskListProps) {
           )) : <div className="text-center text-md p-2 pb-0">No tasks to show...</div>}
         </div>
       </SortableContext>
-      <AddNewTask />
+      <AddNewTask taskListTarget={title} />
     </div>
   );
 };
 
-function AddNewTask() {
-  const { dispatch } = useTaskModal()
+function AddNewTask({ taskListTarget }: { taskListTarget: string }) {
+  const { dispatch } = useBoardContext()
 
   const handleAddTask = () => {
     dispatch({
       type: 'ADD_TASK',
+      taskListTarget
     })
   }
 

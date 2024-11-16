@@ -8,9 +8,10 @@ import {
 } from "@/components/ui/card"
 
 import { ITask } from '../types';
-import { useTaskModal } from "@/hooks/useTaskModal";
+import { useBoardContext } from "@/hooks/useBoardContext";
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
+import { useAddTask, useDeleteTask } from "@/hooks/useTaskActions";
 
 type TaskItemProps = {
   task: ITask;
@@ -28,18 +29,25 @@ type TaskItemProps = {
 // }
 
 const TaskItem = ({ task }: TaskItemProps) => {
-  const { handleOpenModal, dispatch } = useTaskModal()
+  const { closeModal, refetchTasks, openEditModal } = useBoardContext()
+  const { deleteTask } = useDeleteTask()
 
-  const handleDeleteTask = (event) => {
+  const handleDeleteTask = async (event: React.MouseEvent) => {
     event.stopPropagation()
-    console.log('Delete modal')
-    dispatch({
-      type: 'CLOSE_MODAL',
-    })
+    try {
+      await deleteTask({
+        variables: { taskID: task.id }, // Passing the item ID to the mutation
+      });
+      refetchTasks()
+      closeModal()
+    } catch (e) {
+      console.error(e);
+    }
+
   }
 
   return (
-    <div onClick={() => handleOpenModal(task)}>
+    <div onClick={() => openEditModal(task)}>
       <Card >
         <CardHeader className="flex flex-row justify-between items-center pt-2 pb-0">
           <CardTitle>
