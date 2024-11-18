@@ -12,12 +12,11 @@ export interface ITask {
 	taskID?: string;
 	title: string;
 	description: string;
-	status: keyof TaskStatusType;
+	status: TaskStatusOption;
 };
 
-// TODO: Convert into map to improve perforrmance
-// TODO: change name for boardprovider
-export type BoardColumnsType = Record<keyof TaskStatusType, ITask[]>
+export type TaskStatusOption = "TODO" | "IN_PROGRESS" | "REVIEWING" | "DONE"
+export type BoardColumnsType = Record<TaskStatusOption, ITask[] | undefined>
 
 export enum BoardContextActions {
 	ADD_TASK = "ADD_TASK",
@@ -27,7 +26,7 @@ export enum BoardContextActions {
 }
 
 export type TaskListTargetType = {
-	taskListTarget: keyof TaskStatusType | null
+	taskListTarget: TaskStatusOption | null
 }
 export type TargetTaskType = {
 	targetTask: ITask | null
@@ -68,9 +67,9 @@ export interface IDeleteTaskData {
 }
 
 export interface IUpdateTaskData {
-	updateTask: ITask
+	updateTask: Partial<ITask>
 }
 
 export interface IAddTaskData {
-	addTask: ITask
+	addTask: Pick<ITask, 'title' | 'description' | 'status'>
 }

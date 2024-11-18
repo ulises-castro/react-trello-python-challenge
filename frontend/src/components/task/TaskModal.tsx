@@ -11,9 +11,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { useBoardContext } from "@/hooks/useBoardContext"
 import { Textarea } from "../ui/textarea"
-import { useEffect, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { useAddTask, useUpdateTask } from "@/hooks/useTaskActions"
 import { Loader2 } from "lucide-react"
+import { BoardContextActions, ITask, TaskStatusOption } from "@/types"
 
 export default function TaskModal() {
 	const { closeModal, isTaskModalOpen, state, task, status, refetchTasks } = useBoardContext()
@@ -21,7 +22,7 @@ export default function TaskModal() {
 	const { updateTask, loading: isUpdatingTask } = useUpdateTask()
 
 	const isWaitingData = isUpdatingTask || isAddingTask
-	const isEditMode = state.action === 'EDIT_TASK'
+	const isEditMode = state.action === BoardContextActions.EDIT_TASK
 
 	const [title, setTitle] = useState('')
 	const [description, setDescription] = useState('')
@@ -33,23 +34,23 @@ export default function TaskModal() {
 
 	const onAddTask = async () => {
 		try {
-			const response = await addTask({
+			await addTask({
 				variables: {
 					title,
 					description,
-					status
+					status: status as TaskStatusOption
 				}
 			})
 			refetchTasks()
 		} catch {
-			console.log('')
+			console.error('Something went wrong')
 		}
 	}
 
 	const onUpdateTask = async () => {
 		try {
-			const { id: taskID } = task
-			const response = await updateTask({
+			const { id: taskID } = task as ITask
+			await updateTask({
 				variables: {
 					taskID,
 					newValues: {
@@ -60,11 +61,11 @@ export default function TaskModal() {
 			})
 			refetchTasks()
 		} catch {
-			console.log('')
+			console.error('Something went wrong')
 		}
 	}
 
-	const onSubmit = (event) => {
+	const onSubmit = (event: FormEvent) => {
 		event.preventDefault()
 		try {
 			if (isEditMode) {
@@ -86,7 +87,7 @@ export default function TaskModal() {
 			<DialogContent className="sm:max-w-md" onCloseModal={closeModal} onEscapeKeyDown={closeModal} onInteractOutside={closeModal}>
 				<form onSubmit={onSubmit}>
 					<DialogHeader className="mb-4">
-					<DialogTitle> {isEditMode ? `Edit task "${task.title}"` : 'Add a new task'}</DialogTitle>
+						<DialogTitle> {isEditMode && task ? `Edit task "${task.title}"` : 'Add a new task'}</DialogTitle>
 				</DialogHeader>
 					<div className="grid w-full items-center gap-2">
 						<div className="flex flex-col space-y-2">
@@ -106,7 +107,7 @@ export default function TaskModal() {
 								Close
 							</Button>
 						</DialogClose>
-						<TaskModalSubmitBtn isValid={isValid} isEditMode={isEditMode} isLoading={isWaitingData} onSubmit={onSubmit} />
+						<TaskModalSubmitBtn isValid={!!isValid} isEditMode={isEditMode} isLoading={isWaitingData} />
 				</DialogFooter>
 				</form>
 			</DialogContent>
@@ -114,7 +115,13 @@ export default function TaskModal() {
 	)
 }
 
-const TaskModalSubmitBtn = ({ isEditMode, onSubmit, isValid, isLoading }) => {
+type TaskModalSubmitBtnProps = {
+	isEditMode: boolean;
+	isValid: boolean;
+	isLoading: boolean;
+}
+
+const TaskModalSubmitBtn = ({ isEditMode, isValid, isLoading }: TaskModalSubmitBtnProps) => {
 
 	const label = isEditMode ? 'Save' : 'Create new task'
 
@@ -128,6 +135,5 @@ const TaskModalSubmitBtn = ({ isEditMode, onSubmit, isValid, isLoading }) => {
 			}
 		</Button>
 	)
-
 }
 

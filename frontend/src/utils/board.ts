@@ -1,6 +1,7 @@
 import { TaskStatuses } from '@/constants';
 import {
-  BoardColumnsType, TaskStatusType, ITask
+  BoardColumnsType, TaskStatusType, ITask,
+  TaskStatusOption
 } from '../types';
 import { getTasksByStatus } from './tasks';
 
@@ -18,15 +19,16 @@ export const initializeBoard = (tasks: ITask[]) => {
 };
 
 export const findBoardColumnContainer = (
-  boardCols: BoardColumnsType,
-  id: string
-) => {
-  if (id in boardCols) {
+  boardColumns: BoardColumnsType,
+  id: TaskStatusOption
+): TaskStatusOption => {
+  if (id in boardColumns) {
     return id;
   }
 
-  const container = Object.keys(boardCols).find((key) =>
-    boardCols[key as keyof TaskStatusType].find((taskItem: ITask) => taskItem.id === id)
+  const container = Object.keys(boardColumns).find((key) =>
+    boardColumns[key as keyof BoardColumnsType]!.find((taskItem: ITask) => taskItem.id === id)
   );
-  return container;
+
+  return container as TaskStatusOption;
 };

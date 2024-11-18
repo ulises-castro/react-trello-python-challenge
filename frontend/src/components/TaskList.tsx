@@ -3,12 +3,13 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { ITask } from '../types';
+import { BoardContextActions, ITask, TaskStatusType } from '../types';
 import TaskItem from './TaskItem';
 import SortableTaskItem from './SortableTaskItem';
 import { useBoardContext } from '@/hooks/useBoardContext';
 import { Plus } from 'lucide-react';
 import { Button } from './ui/button';
+import { useCallback } from 'react';
 
 type TaskListProps = {
   id: string;
@@ -17,10 +18,10 @@ type TaskListProps = {
 };
 
 export default function TaskList({ id, title, tasks }: TaskListProps) {
-
   const { setNodeRef } = useDroppable({
     id,
-  });
+  })
+
   return (
     <div className='bg-gray-200 rounded-md shadow-sm px-2 py-3 w-full'>
       <h5 className='ml-4 mb-2 text-xl capitalize font-semibold'>
@@ -49,12 +50,14 @@ export default function TaskList({ id, title, tasks }: TaskListProps) {
 function AddNewTask({ taskListTarget }: { taskListTarget: string }) {
   const { dispatch } = useBoardContext()
 
-  const handleAddTask = () => {
+  const handleAddTask = useCallback(() => {
     dispatch({
-      type: 'ADD_TASK',
-      taskListTarget
+      type: BoardContextActions.ADD_TASK,
+      payload: {
+        taskListTarget: taskListTarget as keyof TaskStatusType
+      }
     })
-  }
+  }, [dispatch, taskListTarget])
 
   return (
     <div className='w-full mt-4'>
