@@ -25,7 +25,6 @@ class UpdateTaskNewValuesInput(InputObjectType):
     status = TaskStatusOptions()
 
 
-# Define the Query class, which will allow fetching task information
 class UpdateTask(graphene.Mutation):
     class Arguments:
         taskID = String(required=True)
@@ -42,14 +41,13 @@ class UpdateTask(graphene.Mutation):
         return UpdateTask(task=task)
 
 
-# Define the CreateTask mutation class
 class AddTask(graphene.Mutation):
     class Arguments:
         title = String(required=True)
         description = String(required=True)
         status = TaskStatusOptions(required=True)
 
-    task = graphene.Field(Task)  # The result of the mutation is a Task object
+    task = graphene.Field(Task)
 
     def mutate(self, info, title, description, status):
         status_format = status.value
@@ -84,9 +82,8 @@ class Query(ObjectType):
         return list(map(lambda task: {**task, "id": task["taskID"]}, tasks))
 
 
-# Define the root Mutation class, which includes all mutation classes
 class Mutation(graphene.ObjectType):
-    add_task = AddTask.Field()  # Expose CreateTask mutation as 'create_task'
+    add_task = AddTask.Field()
     update_task = UpdateTask.Field()
     delete_task = DeleteTask.Field()
 

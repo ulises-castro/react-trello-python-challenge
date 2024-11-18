@@ -2,7 +2,6 @@ import logging
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from src.task_data import DUMMY_TASKS
 
 logger = logging.getLogger(__name__)
 
@@ -88,42 +87,7 @@ class DynamoManager:
             return self._table
 
     def populate_table(self):
+        from src.task_data import DUMMY_TASKS
+
         for task in DUMMY_TASKS:
             self._table.put_item(Item=task)
-
-
-def init(dyn_resource):
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-
-    print("-" * 88)
-    print("Welcome to the Amazon DynamoDB getting started demo.")
-    print("-" * 88)
-    table_name = "Tasks"
-    dynamo_manager = DynamoManager(dyn_resource)
-    tasks_exists = dynamo_manager.create_or_load_table(table_name)
-    # movies_exists = movies.exists(table_name)
-    if not tasks_exists:
-        print(f"\nCreating table {table_name}...")
-        dynamo_manager.create_table(table_name)
-        print(f"\nCreated table {dynamo_manager._table.name}.")
-
-    dynamo_manager.populate_table()
-    # tasks.get_tasks_by_status("DONE")
-
-    return dynamo_manager
-
-
-if __name__ == "__main__":
-    try:
-        local_dynamodb = boto3.resource(
-            "dynamodb",
-            region_name="us-west-2",
-            endpoint_url="http://localhost:8000",
-            aws_access_key_id="fakeAccessKeyId",
-            aws_secret_access_key="fakeSecretAccessKey",
-        )
-        init(local_dynamodb)
-
-        # run_scenario("doc-example-table-movies", "moviedata.json", local_dynamodb)
-    except Exception as e:
-        print(f"Something went wrong with the demo! Here's what: {e}")

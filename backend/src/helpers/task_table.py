@@ -137,5 +137,4 @@ def init():
     dynamo_manager.create_or_load_table(TABLE_TASKS_NAME)
     return TaskTable(dynamo_manager)
 
-
 task_table = init()
