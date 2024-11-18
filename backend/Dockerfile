@@ -1,5 +1,5 @@
 # Use official Python image as the base
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -11,17 +11,12 @@ RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	build-essential \
-	&& rm -rf /var/lib/apt/lists/*
-
 # Install Python dependencies
-COPY requirements.txt .
+COPY ./src/requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY src/ src/
 
 # Change ownership to the non-root user
 RUN chown -R appuser:appgroup /app
@@ -33,4 +28,4 @@ USER appuser
 EXPOSE 5000
 
 # Define the entry point
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--workers", "2"]
+CMD ["gunicorn", "src.app:app", "--bind", "0.0.0.0:5000", "--workers", "2"]
