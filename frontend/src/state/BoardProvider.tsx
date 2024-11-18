@@ -1,42 +1,48 @@
-import { useReducer } from "react"
-import { BoardContext } from "./BoardContext"
+import { ReactNode, useReducer } from "react";
+import { BoardContext } from "./BoardContext";
+import { BoardContextActions, BoardProviderAction, BoardProviderState } from "@/types";
 
-const initialState = {
-  targetTask: '',
-  action: '',
-  taskListTarget: ''
+const initialState: BoardProviderState = {
+  targetTask: null,
+  action: null,
+  taskListTarget: null
 }
 
-const reducer = (state, action) => {
+const reducer = (prevState: BoardProviderState, action: BoardProviderAction) => {
   const updatedState = {
-    ...state,
-    action: action.type
+    ...prevState,
+    action: action?.type,
   }
 
-  switch (action.type) {
-    case 'CLOSE_MODAL':
+  switch (action?.type) {
+    case BoardContextActions.CLOSE_MODAL:
       return initialState 
-    case 'ADD_TASK':
+    case BoardContextActions.ADD_TASK:
       return {
         ...updatedState,
-        taskListTarget: action.taskListTarget 
+        taskListTarget: action.payload.taskListTarget 
       }
-    case 'EDIT_TASK':
+    case BoardContextActions.EDIT_TASK:
       return {
         ...updatedState,
         targetTask: action.payload.targetTask,
       }
-    case 'DELETE_TASK':
+    case BoardContextActions.DELETE_TASK:
       return {
         ...updatedState,
         targetTask: action.payload.targetTask,
       }
     default:
-      return state
+      throw new Error('Unknown board action')
   }
 }
 
-export const BoardProvider = ({ children, refetchTasks }) => {
+interface BoardProviderProps {
+  children: ReactNode;
+  refetchTasks: () => void;
+}
+
+export const BoardProvider = ({ children, refetchTasks }: BoardProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
