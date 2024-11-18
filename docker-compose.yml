@@ -1,12 +1,52 @@
-version: '3.8'
 services:
- dynamodb-local:
-   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-   image: "amazon/dynamodb-local:latest"
-   container_name: dynamodb-local
-   ports:
-     - "8000:8000"
-   volumes:
-     - "./docker/dynamodb:/home/dynamodblocal/data"
-   working_dir: /home/dynamodblocal
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    networks:
+      - internal
+    working_dir: /home/dynamodblocal
+    
+  backend:
+    container_name: backend-app
+    build:
+      context: ./backend  
+      dockerfile: Dockerfile 
+    ports:
+      - "5000:5000"  
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - dynamodb-local  
+    networks:
+      - internal
+      - external
+    restart: on-failure 
 
+  frontend:
+    container_name: frontend-app
+    build:
+      context: ./frontend 
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    ports:
+      - "3000:80" 
+    depends_on:
+      - dynamodb-local
+      - backend 
+    restart: on-failure 
+    networks:
+      - external
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+    internal: true
+  external:
+    driver: bridge

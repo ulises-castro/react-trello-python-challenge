@@ -1,0 +1,35 @@
+# Common patterns
+node_modules/*
+build
+.git
+*.md
+Dockerfile
+docker-compose.yml
+# Frontend
+frontend/node_modules/*
+
+# Python dependencies
+backend/__pycache__
+backend/.venv
+backend/venv
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+docker-compose.yml
+Dockerfile
+README.md
+*.md
+
+# IDE and editor directories
+.vscode/
+.idea/
