@@ -1,8 +1,9 @@
-import { ADD_TASK, DELETE_TASK, UPDATE_TASK } from "@/graphql/mutations";
-import { useMutation } from "@apollo/client";
+import { ADD_TASK_MUTATION, DELETE_TASK_MUTATION, UPDATE_TASK_MUTATION } from "@/graphql/mutations";
+import { ApolloError, useMutation } from "@apollo/client";
 import { useCallback, useEffect } from "react";
-import { toast, useToast } from "./use-toast";
+import { useToast } from "./use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { IAddTaskData, IDeleteTaskData, ITask, IUpdateTaskData } from "@/types";
 
 
 export function useTaskActionToast<T>({
@@ -11,14 +12,14 @@ export function useTaskActionToast<T>({
 	error,
 	action
 }: {
-	data: T,
+		data: T | null | undefined,
 	loading: boolean,
-	error: T,
+		error: ApolloError | undefined,
 	action: string
 }) {
 	const { toast } = useToast()
 
-	const showErrorToast = useCallback((msg: string) => {
+	const showErrorToast = useCallback((msg: string | ApolloError) => {
 		toast({
 			variant: "destructive",
 			title: "Uh oh! Something went wrong.",
@@ -36,9 +37,8 @@ export function useTaskActionToast<T>({
 				title: `Task was ${action}`,
 				description: `Task was ${action} sucessfully.`,
 			})
-			// Optionally update your cache here to reflect the deletion
 		} else {
-			showErrorToast('Something weird happens.')
+			showErrorToast('We weren\'t able to process your request.')
 		}
 	}, [action, data, loading, showErrorToast, toast])
 
@@ -48,11 +48,17 @@ export function useTaskActionToast<T>({
 	}, [error, showErrorToast])
 }
 
+interface DeleteTaskData {
+	deleteTask: {
+		ok: boolean;
+		message: string
+	} | null
+}
 
 export function useDeleteTask() {
 	// Destructure the mutation function and its states from useMutation
-	const [deleteTask, { data, loading, error }] = useMutation(DELETE_TASK, {
-		update(cache, { data: { deleteTask } }) {
+	const [deleteTask, { data, loading, error }] = useMutation<IDeleteTaskData, { taskID: string }>(DELETE_TASK_MUTATION, {
+	// update(cache, { data: { deleteTask } }) {
 			// if (deleteTask.ok) {
 			// 	toast({
 			// 		title: "Task was deleted",
@@ -67,9 +73,9 @@ export function useDeleteTask() {
 			// 		action: <ToastAction altText="Try again">Try again</ToastAction>,
 			// 	})
 			// }
-		},
+		// },
 	})
-	useTaskActionToast({ data, loading, error, action: "deleted" })
+	useTaskActionToast<DeleteTaskData>({ data, loading, error, action: "deleted" })
 
 	return { deleteTask, data, loading }
 }
@@ -77,7 +83,7 @@ export function useDeleteTask() {
 
 export function useAddTask() {
 	// Destructure the mutation function and its states from useMutation
-	const [addTask, { data, loading, error }] = useMutation(ADD_TASK, {
+	const [addTask, { data, loading, error }] = useMutation<IAddTaskData, Partial<ITask>>(ADD_TASK_MUTATION, {
 		// update(cache, { data: { deleteItem } }) {
 		// 	if (deleteItem.ok) {
 		// 		// Optionally update your cache here to reflect the deletion
@@ -91,14 +97,14 @@ export function useAddTask() {
 
 export function useUpdateTask() {
 	// Destructure the mutation function and its states from useMutation
-	const [updateTask, { data, loading, error }] = useMutation(UPDATE_TASK, {
-		update(cache, { data: { deleteItem } }) {
-			// if (deleteItem.ok) {
-				// Optionally update your cache here to reflect the deletion
-			// }
-		},
+	const [updateTask, { data, loading, error }] = useMutation<IUpdateTaskData, Partial<ITask>>(UPDATE_TASK_MUTATION, {
+	// update(cache, { data: { deleteItem } }) {
+	// 	// if (deleteItem.ok) {
+	// 		// Optionally update your cache here to reflect the deletion
+	// 	// }
+	// },
 	});
-	useTaskActionToast({ data, loading, error, action: "updated" })
+	useTaskActionToast<IUpdateTaskData>({ data, loading, error, action: "updated" })
 
 	return { updateTask, data, loading }
 }

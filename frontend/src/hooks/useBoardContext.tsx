@@ -1,39 +1,32 @@
-import { useContext } from "react"
+import { useCallback, useContext } from "react"
 import { BoardContext } from "@/state/BoardContext"
-import { ITask } from "@/types"
-
+import { ITask, BoardContextActions } from "@/types"
 
 export const useBoardContext = () => {
 	const context = useContext(BoardContext)
 
 	if (!context) {
-		throw new Error('useTaskModal must be used within a CounterProvider')
+		throw new Error('useBoardContext must be used within a BoardProvider')
 	}
 
 	const { state, dispatch, refetchTasks } = context
 	const isTaskModalOpen = !!state.action
 	const taskListTarget = state.taskListTarget
 
-	const openEditModal = (task: ITask) => {
+	const openEditModal = useCallback((task: ITask) => {
 		dispatch({
-			type: 'EDIT_TASK',
+			type: BoardContextActions.EDIT_TASK,
 			payload: {
 				targetTask: task,
 			}
 		})
-	}
-	const closeModal = () => {
-		dispatch({
-			type: 'CLOSE_MODAL'
-		})
-	}
+	}, [dispatch])
 
-	const deleteTask = () => {
-		console.log('Delete modal')
+	const closeModal = useCallback(() => {
 		dispatch({
-			type: 'CLOSE_MODAL',
+			type: BoardContextActions.CLOSE_MODAL 
 		})
-	}
+	}, [dispatch])
 
 	return {
 		state,
@@ -43,7 +36,6 @@ export const useBoardContext = () => {
 		status: taskListTarget,
 		isTaskModalOpen,
 		closeModal,
-		deleteTask,
 		openEditModal
 	}
 }
