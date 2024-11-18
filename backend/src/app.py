@@ -5,7 +5,10 @@ from graphql_server.flask import GraphQLView
 from src.schema import schema
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(
+    app,
+    resources={r"/graphql": {"origins": "http://localhost:3000", "methods": ["POST"]}},
+)
 
 app.add_url_rule(
     "/graphql",
