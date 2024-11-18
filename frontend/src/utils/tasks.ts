@@ -1,6 +1,6 @@
-import { ITask, TaskStatus } from '../types';
+import { ITask } from '../types';
 
-export const getTasksByStatus = (tasks: ITask[], status: TaskStatus) => {
+export const getTasksByStatus = (tasks: ITask[], status: string) => {
   return tasks.filter((task) => task.status === status);
 };
 
