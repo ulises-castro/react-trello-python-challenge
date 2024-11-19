@@ -28,7 +28,7 @@ class DynamoManager:
             exists = True
         except ClientError as err:
             if err.response["Error"]["Code"] == "ResourceNotFoundException":
-                return self.create_table(table)
+                return self.create_table(table_name)
             else:
                 logger.error(
                     "Couldn't check for existence of %s. Here's why: %s: %s",
@@ -64,6 +64,7 @@ class DynamoManager:
                             {"AttributeName": "status", "KeyType": "HASH"},
                             {"AttributeName": "createdAt", "KeyType": "RANGE"},
                         ],
+                        "Projection": {"ProjectionType": "ALL"},
                         "ProvisionedThroughput": {
                             "ReadCapacityUnits": 5,
                             "WriteCapacityUnits": 5,

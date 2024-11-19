@@ -37,12 +37,10 @@ services:
     ports:
       - "3000:80" 
     depends_on:
-      - dynamodb-local
       - backend 
     restart: on-failure 
     networks:
       - external
-      - internal
 
 networks:
   internal:
