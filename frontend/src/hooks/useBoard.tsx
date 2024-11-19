@@ -17,10 +17,12 @@ import { BoardColumnsType, ITask, TaskStatusOption } from '@/types';
 
 import { findBoardColumnContainer, initializeBoard } from '@/utils/board';
 import { getTaskById } from '@/utils/tasks';
+import { useUpdateTask } from './useTaskActions';
 
 
 export default function useBoard() {
 	const { loading, error, data, refetch } = useQuery<{ allTasks: ITask[] }>(GET_ALL_TASKS_QUERY);
+	const { updateTask } = useUpdateTask(true)
 
 	const [boardColumns, setBoardColumns] =
 		useState<BoardColumnsType | null>(null);
@@ -36,6 +38,25 @@ export default function useBoard() {
 		}
 
 	}, [loading, data])
+
+	const activeTask = activeId && data?.allTasks ? getTaskById(data?.allTasks, activeId) : null;
+
+	const updateTaskStatus = useCallback(async (newStatus: TaskStatusOption) => {
+		if (!activeTask) return
+
+		try {
+			await updateTask({
+				variables: {
+					taskID: activeTask.id,
+					newValues: {
+						status: newStatus
+					}
+				}
+			})
+		} catch {
+			console.error('Something went wrong')
+		}
+	}, [activeTask, updateTask]);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -97,6 +118,12 @@ export default function useBoard() {
 			const boardActive = boardColumn![activeContainer] ?? []
 			const boardOver = boardColumn![overContainer] ?? []
 
+			boardActive[activeIndex] = {
+				...boardActive[activeIndex],
+				status: overContainer
+			}
+			updateTaskStatus(overContainer as TaskStatusOption)
+
 			return {
 				...boardColumn,
 				[activeContainer]: [
@@ -114,7 +141,7 @@ export default function useBoard() {
 				],
 			} as BoardColumnsType;
 		});
-	}, [validateDragDropArea]);
+	}, [updateTaskStatus, validateDragDropArea]);
 
 	const handleDragEnd = useCallback((event: DragEndEvent) => {
 		const validation = validateDragDropArea(event, true)
@@ -134,14 +161,21 @@ export default function useBoard() {
 		);
 
 		if (activeIndex !== overIndex) {
-			setBoardColumns((boardCol) => ({
+
+
+
+			setBoardColumns((boardCol) => {
+				// if (boardCol === active)
+				return {
 				...boardCol,
 				[overContainer]: arrayMove(
 					boardCol![overContainer]!,
 					activeIndex,
 					overIndex
 				),
-			} as BoardColumnsType));
+				} as BoardColumnsType
+			})
+
 		}
 
 		setActiveId(null);
@@ -151,7 +185,6 @@ export default function useBoard() {
 		...defaultDropAnimation,
 	}
 
-	const activeTask = activeId && data?.allTasks ? getTaskById(data?.allTasks, activeId) : null;
 
 	return {
 		dragDrop: {

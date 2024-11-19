@@ -56,25 +56,7 @@ interface DeleteTaskData {
 }
 
 export function useDeleteTask() {
-	// Destructure the mutation function and its states from useMutation
-	const [deleteTask, { data, loading, error }] = useMutation<IDeleteTaskData, { taskID: string }>(DELETE_TASK_MUTATION, {
-	// update(cache, { data: { deleteTask } }) {
-			// if (deleteTask.ok) {
-			// 	toast({
-			// 		title: "Task was deleted",
-			// 		description: "Task was delete sucessfully.",
-			// 	})
-			// 	// Optionally update your cache here to reflect the deletion
-			// } else {
-			// 	toast({
-			// 		variant: "destructive",
-			// 		title: "Uh oh! Something went wrong.",
-			// 		description: "There was a problem with your request: " + deleteTask?.message,
-			// 		action: <ToastAction altText="Try again">Try again</ToastAction>,
-			// 	})
-			// }
-		// },
-	})
+	const [deleteTask, { data, loading, error }] = useMutation<IDeleteTaskData, { taskID: string }>(DELETE_TASK_MUTATION)
 	useTaskActionToast<DeleteTaskData>({ data, loading, error, action: "deleted" })
 
 	return { deleteTask, data, loading }
@@ -82,29 +64,17 @@ export function useDeleteTask() {
 
 
 export function useAddTask() {
-	// Destructure the mutation function and its states from useMutation
-	const [addTask, { data, loading, error }] = useMutation<IAddTaskData, Partial<ITask>>(ADD_TASK_MUTATION, {
-		// update(cache, { data: { deleteItem } }) {
-		// 	if (deleteItem.ok) {
-		// 		// Optionally update your cache here to reflect the deletion
-		// 	}
-		// },
-	});
+	const [addTask, { data, loading, error }] = useMutation<IAddTaskData, Partial<ITask>>(ADD_TASK_MUTATION)
 	useTaskActionToast({ data, loading, error, action: "added" })
 
 	return { addTask, data, loading }
 }
 
-export function useUpdateTask() {
-	// Destructure the mutation function and its states from useMutation
-	const [updateTask, { data, loading, error }] = useMutation<IUpdateTaskData, Partial<ITask>>(UPDATE_TASK_MUTATION, {
-	// update(cache, { data: { deleteItem } }) {
-	// 	// if (deleteItem.ok) {
-	// 		// Optionally update your cache here to reflect the deletion
-	// 	// }
-	// },
-	});
-	useTaskActionToast<IUpdateTaskData>({ data, loading, error, action: "updated" })
+export function useUpdateTask(onlyStatus = false) {
+	const [updateTask, { data, loading, error }] = useMutation<IUpdateTaskData, { taskID: string, newValues: Partial<ITask> }>(UPDATE_TASK_MUTATION)
+
+	const action = onlyStatus ? 'moved' : 'updated'
+	useTaskActionToast<IUpdateTaskData>({ data, loading, error, action })
 
 	return { updateTask, data, loading }
 }
