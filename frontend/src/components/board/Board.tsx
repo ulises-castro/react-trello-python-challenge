@@ -3,8 +3,8 @@ import {
   closestCorners, DragOverlay
 } from '@dnd-kit/core';
 
-import TaskList from '../TaskList';
-import TaskItem from '../TaskItem';
+import TaskList from '../task/TaskList';
+import TaskItem from '../task/TaskItem';
 
 import { BoardProvider } from '@/state/BoardProvider';
 import useBoard from '@/hooks/useBoard';
