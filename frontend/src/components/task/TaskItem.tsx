@@ -8,8 +8,8 @@ import {
 import { useBoardContext } from "@/hooks/useBoardContext";
 import { useDeleteTask } from "@/hooks/useTaskActions";
 
-import { ITask } from '../types';
-import { Button } from "./ui/button";
+import { ITask } from '../../types';
+import { Button } from "../ui/button";
 
 type TaskItemProps = {
   task: ITask;
@@ -23,7 +23,7 @@ const TaskItem = ({ task }: TaskItemProps) => {
     event.stopPropagation()
     try {
       await deleteTask({
-        variables: { taskID: task.id }, // Passing the item ID to the mutation
+        variables: { taskID: task.id },
       });
       refetchTasks()
       closeModal()
@@ -44,9 +44,9 @@ const TaskItem = ({ task }: TaskItemProps) => {
           </Button>
         </CardHeader>
         <CardContent className="pt">
-        <p className='text-ellipsis text-sm'>{task.description}</p>
+          <p className='text-ellipsis text-sm'>{task.description}</p>
         </CardContent>
-    </Card>
+      </Card>
     </div>
   );
 };

@@ -81,13 +81,14 @@ export default function TaskModal() {
 	if (!isTaskModalOpen) return null
 
 	const isValid = description && title
+	const modalTitle = isEditMode && task ? `Edit task "${task.title}"` : 'Add a new task'
 
 	return (
 		<Dialog open={isTaskModalOpen}>
-			<DialogContent className="sm:max-w-md" onCloseModal={closeModal} onEscapeKeyDown={closeModal} onInteractOutside={closeModal}>
+			<DialogContent aria-describedby={modalTitle} className="sm:max-w-md" onCloseModal={closeModal} onEscapeKeyDown={closeModal} onInteractOutside={closeModal}>
 				<form onSubmit={onSubmit}>
 					<DialogHeader className="mb-4">
-						<DialogTitle> {isEditMode && task ? `Edit task "${task.title}"` : 'Add a new task'}</DialogTitle>
+						<DialogTitle>{modalTitle}</DialogTitle>
 				</DialogHeader>
 					<div className="grid w-full items-center gap-2">
 						<div className="flex flex-col space-y-2">

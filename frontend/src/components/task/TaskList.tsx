@@ -3,12 +3,12 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { BoardContextActions, ITask, TaskStatusType } from '../types';
+import { BoardContextActions, ITask, TaskStatusType } from '../../types';
 import TaskItem from './TaskItem';
 import SortableTaskItem from './SortableTaskItem';
 import { useBoardContext } from '@/hooks/useBoardContext';
 import { Plus } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { useCallback } from 'react';
 
 type TaskListProps = {
@@ -25,7 +25,7 @@ export default function TaskList({ id, title, tasks }: TaskListProps) {
   return (
     <div className='bg-gray-200 rounded-md shadow-sm px-2 py-3 w-full'>
       <h5 className='ml-4 mb-2 text-xl capitalize font-semibold'>
-        {title}
+        {title.replace('_', ' ')}
       </h5>
       <SortableContext
         id={id}
