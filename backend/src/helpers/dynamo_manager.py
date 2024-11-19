@@ -41,6 +41,7 @@ class DynamoManager:
             self._table = table
         return exists
 
+    # @handle_client_error
     def create_table(self, table_name):
         """
         Creates table to store tasks.

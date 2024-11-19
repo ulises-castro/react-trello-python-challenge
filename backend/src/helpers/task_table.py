@@ -88,26 +88,44 @@ class TaskTable:
         else:
             return response
 
+    def _get_params_from_attributes(self, taskID, attributes_to_update):
+        update_expression = "SET "
+        expression_attribute_values = {}
+        expression_attribute_names = None
+
+        for key, value in attributes_to_update.items():
+            if key == "status":
+                expression_attribute_names = {"#status": "status"}
+                update_expression += f"#{key} = :{key}, "
+            else:
+                update_expression += f"{key} = :{key}, "
+            expression_attribute_values[f":{key}"] = value
+
+        update_expression = update_expression[:-2]
+
+        kwargs = {
+            "Key": {"taskID": taskID},
+            "UpdateExpression": update_expression,
+            "ExpressionAttributeValues": expression_attribute_values,
+            "ReturnValues": "UPDATED_NEW",
+            "ConditionExpression": "attribute_exists(taskID)",
+        }
+
+        if expression_attribute_names:
+            kwargs["ExpressionAttributeNames"] = expression_attribute_names
+
+        return kwargs
+
+    # @handle_client_error
     def update_task(self, taskID, attributes_to_update):
         """
         Updates specific attributes of a task in the table.
         """
         try:
-            update_expression = "SET "
-            expression_attribute_values = {}
-            for key, value in attributes_to_update.items():
-                update_expression += f"{key} = :{key}, "
-                expression_attribute_values[f":{key}"] = value
-
-            update_expression = update_expression[:-2]
-
-            response = self._table.update_item(
-                Key={"taskID": taskID},
-                UpdateExpression=update_expression,
-                ExpressionAttributeValues=expression_attribute_values,
-                ReturnValues="UPDATED_NEW",
-                ConditionExpression="attribute_exists(taskID)",
+            params = self._get_params_from_attributes(
+                taskID=taskID, attributes_to_update=attributes_to_update
             )
+            response = self._table.update_item(**params)
         except ClientError as err:
             logger.error(
                 "Couldn't update task %s. Here's why: %s: %s",
@@ -121,7 +139,6 @@ class TaskTable:
 
 
 def init():
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     local_dynamodb = boto3.resource(
         "dynamodb",
         region_name=os.getenv("AWS_DEFAULT_REGION", "us-west-2"),
@@ -130,11 +147,9 @@ def init():
         aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "fakeAccessKeyId"),
     )
 
-    print("-" * 88)
-    print("Task manager initialized.")
-    print("-" * 88)
     dynamo_manager = DynamoManager(local_dynamodb)
     dynamo_manager.create_or_load_table(TABLE_TASKS_NAME)
     return TaskTable(dynamo_manager)
+
 
 task_table = init()
