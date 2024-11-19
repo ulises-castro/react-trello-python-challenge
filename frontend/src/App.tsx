@@ -1,16 +1,22 @@
-import Board from "@/components/board/Board"
-import { Suspense } from "react"
-import BoardSkeleton from "./components/board/BoardSkeleton"
-import { Toaster } from "./components/ui/toaster"
+import Board from "@/components/board/Board";
+import { Toaster } from "./components/ui/toaster";
+import { ErrorBoundary } from "react-error-boundary";
+import { Fallback } from "./components/Fallback";
+import { logErrorToSentry } from "./lib/utils";
+
 
 function App() {
+  const handleOnResetApp = () => {
+    window.location.reload()
+  }
+
   return (
     <>
       <div className="bg-primary p-4 text-center w-full text-xl md:text-5xl text-white mb-4"> Board </div>
-      <Suspense fallback={<BoardSkeleton />}>
+      <ErrorBoundary onReset={handleOnResetApp} FallbackComponent={Fallback} onError={logErrorToSentry}>
         <Board />
-      </Suspense>
-      <Toaster />
+        <Toaster />
+      </ErrorBoundary>
     </>
   )
 }
